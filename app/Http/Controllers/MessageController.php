@@ -1,12 +1,15 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\Http\Requests\StoreMessageRequest;
 use App\Models\Message;
+use Illuminate\Contracts\Cache\Store;
 use Illuminate\Http\Request;
 
 class MessageController extends Controller
 {
-    public function showMessages(){
+    public function showMessage(){
         $messages = Message::all();
         return view('messages', ['messages' => $messages]);
     }
@@ -14,18 +17,13 @@ class MessageController extends Controller
         return view("contact");
     }
 
-    public function storeMEssage(Request $request){
-        $validated = $request->validate([
-        'name' => 'required|max:255',
-        'email' => 'required|email',
-        'message' => 'required|min:8|max:1000',
-    ]);
+    public function storeMessage(StoreMessageRequest $request){
+        Message::create([
+            $request -> input('name'),
+            $request -> input('email'),
+            $request -> input('message'),
+        ]);
 
-    Message::create([
-        'sender_name' => $validated['name'],
-        'sender_email' => $validated['email'],
-        'message' => $validated['message'],
-    ]);
-    return redirect('/messages');
+        return redirect('/messages');
     }
 }
